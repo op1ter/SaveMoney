@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Money - Salvar Dados</title>
+    <style>
+        /* ================= Reset e Estilos Globais ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #b8c1c8; /* Cor de fundo cinza azulado */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ================= Estilos da Tela de Cadastro ================= */
+        #register-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Logo Secundário */
+        .small-logo-img {
+            position: absolute;
+            top: 0px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        /* Avatar */
+        .avatar-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 30px;
+            object-fit: contain;
+        }
+
+        .register-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 40px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 100%;
+        }
+
+        input {
+            background-color: transparent;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        /* Estilo para campos inválidos */
+        input.invalid {
+            border-color: red;
+        }
+
+        /* Estilo para mensagens de erro */
+        .error-msg {
+            color: red;
+            font-size: 12px;
+            margin-top: 2px;
+            display: none; /* Oculto por padrão */
+        }
+
+        button.btn-green {
+            background-color: #32c54a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 18px;
+            color: #111;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 250px;
+        }
+
+        button.btn-green:hover {
+            background-color: #2ab03f;
+        }
+
+        /* Responsividade Básica */
+        @media (max-width: 768px) {
+            .register-form-grid {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <form id="register-screen" onsubmit="return validateRegisterForm(event)">
+        <img class="small-logo-img" src="img\savemoney_icon.png" alt="AV Logo">
+        <img class="avatar-img" src="img\icon_pessoa.png" alt="Avatar">
+
+        <div class="register-form-grid">
+            <div class="input-wrapper">
+                <input type="text" id="name-reg" placeholder="Nome completo">
+                <span class="error-msg" id="name-error">Por favor, preencha este campo</span>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" id="dob-reg" placeholder="Data de Nascimento">
+                <span class="error-msg" id="dob-error">Por favor, preencha este campo</span>
+            </div>
+            
+            <div class="input-wrapper">
+                <input type="text" id="cpf-reg" placeholder="CPF" maxlength="14">
+                <span class="error-msg" id="cpf-error">Por favor, preencha este campo</span>
+            </div>
+            <div class="input-wrapper">
+                <input type="tel" id="tel-reg" placeholder="Celular">
+                <span class="error-msg" id="tel-error">Por favor, preencha este campo</span>
+            </div>
+            
+            <div class="input-wrapper">
+                <input type="text" id="addr-reg" placeholder="Endereço">
+                <span class="error-msg" id="addr-error">Por favor, preencha este campo</span>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" id="city-reg" placeholder="Cidade">
+                <span class="error-msg" id="city-error">Por favor, preencha este campo</span>
+            </div>
+            
+            <div class="input-wrapper">
+                <input type="email" id="email-reg" placeholder="E-mail">
+                <span class="error-msg" id="email-error-reg">Por favor, preencha este campo</span>
+            </div>
+            <div class="input-wrapper">
+                <input type="password" id="pass-reg" placeholder="Nova senha">
+                <span class="error-msg" id="pass-error">Por favor, preencha este campo</span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-green">Salvar</button>
+        <a href="login.html" style="margin-top: 20px; color: #333; text-decoration: underline; font-size: 14px;">Sair / Voltar ao Login</a>
+    </form>
+
+    <script>
+        // Validação obrigatória básica
+        function validateField(inputId, errorId, value) {
+            const input = document.getElementById(inputId);
+            const errorSpan = document.getElementById(errorId);
+            
+            if (value.trim() === '') {
+                input.classList.add('invalid');
+                errorSpan.style.display = 'block';
+                return false;
+            } else {
+                input.classList.remove('invalid');
+                errorSpan.style.display = 'none';
+                return true;
+            }
+        }
+
+        // Algoritmo de validação de CPF
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+
+            if (cpf === '' || cpf.length !== 11) return false;
+
+            const invalidCpfs = [
+                "00000000000", "11111111111", "22222222222", "33333333333",
+                "44444444444", "55555555555", "66666666666", "77777777777",
+                "88888888888", "99999999999"
+            ];
+            if (invalidCpfs.includes(cpf)) return false;
+
+            let add = 0;
+            for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
+            let rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(9))) return false;
+
+            add = 0;
+            for (let i = 0; i < 10; i++) add += parseInt(cpf.charAt(i)) * (11 - i);
+            rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(10))) return false;
+
+            return true;
+        }
+
+        // Função principal disparada ao clicar no botão Salvar
+        function validateRegisterForm(event) {
+            event.preventDefault(); // Impede o recarregamento da página
+
+            const name = document.getElementById('name-reg').value;
+            const dob = document.getElementById('dob-reg').value;
+            const cpf = document.getElementById('cpf-reg').value;
+            const tel = document.getElementById('tel-reg').value;
+            const addr = document.getElementById('addr-reg').value;
+            const city = document.getElementById('city-reg').value;
+            const email = document.getElementById('email-reg').value;
+            const pass = document.getElementById('pass-reg').value;
+
+            const isNameValid = validateField('name-reg', 'name-error', name);
+            const isDobValid = validateField('dob-reg', 'dob-error', dob);
+            const isTelValid = validateField('tel-reg', 'tel-error', tel);
+            const isAddrValid = validateField('addr-reg', 'addr-error', addr);
+            const isCityValid = validateField('city-reg', 'city-error', city);
+            const isEmailValid = validateField('email-reg', 'email-error-reg', email);
+            const isPassValid = validateField('pass-reg', 'pass-error', pass);
+
+            // Verificação específica do CPF
+            const cpfInput = document.getElementById('cpf-reg');
+            const cpfError = document.getElementById('cpf-error');
+            const isCpfEmpty = !validateField('cpf-reg', 'cpf-error', cpf);
+            let isCpfFormatValid = false;
+
+            if (!isCpfEmpty) {
+                if (validateCPF(cpf)) {
+                    isCpfFormatValid = true;
+                    cpfInput.classList.remove('invalid');
+                    cpfError.style.display = 'none';
+                } else {
+                    isCpfFormatValid = false;
+                    cpfInput.classList.add('invalid');
+                    cpfError.innerText = 'CPF inválido';
+                    cpfError.style.display = 'block';
+                }
+            } else {
+                cpfError.innerText = 'Por favor, preencha este campo';
+            }
+
+            // Se tudo estiver certo, você pode prosseguir com a requisição
+            if (isNameValid && isDobValid && isCpfFormatValid && isTelValid && isAddrValid && isCityValid && isEmailValid && isPassValid) {
+                alert('Todos os dados estão válidos! Pronto para salvar no banco de dados.');
+            }
+        }
+
+        // Remove a mensagem de erro do CPF se o usuário corrigir enquanto digita
+        document.getElementById('cpf-reg').addEventListener('input', function() {
+            this.classList.remove('invalid');
+            document.getElementById('cpf-error').style.display = 'none';
+        });
+
+    </script>
+</body>
+</html>
