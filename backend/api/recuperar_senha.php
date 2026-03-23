@@ -27,10 +27,16 @@ if (!empty($data->email)) {
         if ($stmt->rowCount() > 0) {
             $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
             $nomeUsuario = $usuario['NOME_PF'];
+            $idUsuario = $usuario['ID_PF'];
 
-            // 2. Aqui nós geraríamos o Token e salvaríamos no banco.
-            // Por enquanto, vamos simular um token simples para testar o envio.
+            // 2. Gera o Token e salva no banco de dados para validarmos depois
             $token = bin2hex(random_bytes(16)); 
+            
+            $updateQuery = 'UPDATE "USUARIO" SET "TOKEN_SENHA_PF" = :token WHERE "ID_PF" = :id';
+            $updateStmt = $pdo->prepare($updateQuery);
+            $updateStmt->bindParam(':token', $token);
+            $updateStmt->bindParam(':id', $idUsuario);
+            $updateStmt->execute();
 
             // 3. Configura o PHPMailer
             $mail = new PHPMailer(true);
@@ -39,8 +45,8 @@ if (!empty($data->email)) {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'joaovictorfelipe99@gmail.com'; // Coloque seu Gmail aqui
-            $mail->Password   = 'fuyx swwp zbgw ygpn '; // Coloque a senha de app (sem espaços)
+            $mail->Username   = 'joaovictorfelipe99@gmail.com'; 
+            $mail->Password   = 'fhmxwdtxvispmkpg';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // SSL
             $mail->Port       = 465;
             $mail->CharSet    = 'UTF-8';
@@ -51,9 +57,9 @@ if (!empty($data->email)) {
 
             // Conteúdo do E-mail
             $mail->isHTML(true);
-            $mail->Subject = 'Recuperação de Senha - Save Money';
+            $mail->Subject = 'Recuperacao de Senha - Save Money';
             
-            // Link fictício (ajustaremos isso depois para a tela real de trocar a senha)
+            // Link com o caminho correto do seu projeto
             $linkRecuperacao = "http://localhost/savemoney/public/nova_senha.html?token=" . $token;
 
             $mail->Body    = "

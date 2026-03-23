@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/login.css">
+    <title>Save Money - Nova Senha</title>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-left">
+            <img class="avatar-img" src="img/icon_pessoa.png" alt="Avatar">
+            
+            <form class="login-form" onsubmit="return handleNewPassword(event)">
+                <h3 style="text-align: center; color: #333; margin-bottom: 20px;">Criar Nova Senha</h3>
+
+                <div class="input-wrapper">
+                    <input type="password" id="new-pass" placeholder="Nova senha">
+                    <span class="error-msg" id="pass-error">Preencha este campo</span>
+                </div>
+                <div class="input-wrapper">
+                    <input type="password" id="confirm-pass" placeholder="Confirme a nova senha">
+                    <span class="error-msg" id="confirm-error">As senhas não coincidem</span>
+                </div>
+                
+                <span class="error-msg" id="status-msg" style="text-align: center; margin-bottom: 15px; font-weight: bold;"></span>
+
+                <button type="submit" class="btn-green">Salvar Senha</button>
+            </form>
+        </div>
+        
+        <div class="login-right">
+            <img class="logo-img" src="img/savemoney_logo.png" alt="SAVE Money Logo">
+            <h2 class="welcome-title">QUASE LÁ!</h2>
+            <p class="welcome-subtitle">CRIE UMA NOVA SENHA<br>SEGURA PARA SUA CONTA</p>
+        </div>
+    </div>
+
+    <script>
+        // Pega o token da URL (ex: ?token=abcd123)
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        // Se a pessoa tentar acessar a tela sem um token válido na URL, expulsa pro login
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        function handleNewPassword(event) {
+            event.preventDefault();
+            const pass = document.getElementById('new-pass').value;
+            const confirmPass = document.getElementById('confirm-pass').value;
+            const statusMsg = document.getElementById('status-msg');
+
+            if (pass === '' || pass !== confirmPass) {
+                document.getElementById('confirm-pass').classList.add('invalid');
+                document.getElementById('confirm-error').style.display = 'block';
+                return;
+            }
+
+            statusMsg.style.color = "#333";
+            statusMsg.innerText = "Salvando...";
+            statusMsg.style.display = 'block';
+
+            // Envia o Token e a Nova Senha para o PHP
+            fetch('../backend/api/atualizar_senha.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token, nova_senha: pass })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusMsg.style.color = "#32c54a";
+                    statusMsg.innerText = "Senha alterada com sucesso! Redirecionando...";
+                    setTimeout(() => window.location.href = 'login.html', 2000);
+                } else {
+                    statusMsg.style.color = "#ff4757";
+                    statusMsg.innerText = data.message;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
