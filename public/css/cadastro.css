@@ -1,0 +1,109 @@
+/* ================= Reset e Estilos Globais ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #b8c1c8; /* Cor de fundo cinza azulado */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ================= Estilos da Tela de Cadastro ================= */
+        #register-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Logo Secundário */
+        .small-logo-img {
+            position: absolute;
+            top: 0px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        /* Avatar */
+        .avatar-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 30px;
+            object-fit: contain;
+        }
+
+        .register-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 40px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 100%;
+        }
+
+        input {
+            background-color: transparent;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        /* Estilo para campos inválidos */
+        input.invalid {
+            border-color: red;
+        }
+
+        /* Estilo para mensagens de erro */
+        .error-msg {
+            color: red;
+            font-size: 12px;
+            margin-top: 2px;
+            display: none; /* Oculto por padrão */
+        }
+
+        button.btn-green {
+            background-color: #32c54a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 18px;
+            color: #111;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 250px;
+        }
+
+        button.btn-green:hover {
+            background-color: #2ab03f;
+        }
+
+        /* Responsividade Básica */
+        @media (max-width: 768px) {
+            .register-form-grid {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+        }

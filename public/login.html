@@ -1,20 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/login.css">
+    <title>Save Money - Login</title>
 </head>
 <body>
 
-  <h2>Login</h2>
+    <div id="login-screen">
+        <div class="login-left">
+            <img class="avatar-img" src="img\icon_pessoa.png" alt="Avatar">
+            
+            <form class="login-form" onsubmit="return validateLoginForm(event)">
+                <div class="input-wrapper">
+                    <input type="email" id="email-login" placeholder="Email">
+                    <span class="error-msg" id="email-error">Por favor, preencha o email</span>
+                </div>
+                <div class="input-wrapper">
+                    <input type="password" id="password-login" placeholder="Senha">
+                    <span class="error-msg" id="password-error">Por favor, preencha a senha</span>
+                </div>
+                
+                <button type="submit" class="btn-green">Entrar</button>
+                
+                <button type="button" class="btn-outline" onclick="window.location.href='cadastro.html'">Criar conta</button>
+            </form>
+        </div>
+        
+        <div class="login-right">
+            <img class="logo-img" src="img\savemoney_logo.png" alt="SAVE Money Logo">
+            <h2 class="welcome-title">BEM-VINDO</h2>
+            <p class="welcome-subtitle">PARA SE MANTER CONECTADO<br>FAÇA LOGIN COM SUAS CREDENCIAIS</p>
+        </div>
+    </div>
 
-  <form id="loginForm">
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Senha" required />
-    <button type="submit">Entrar</button>
-  </form>
+    <script>
+        function validateField(inputId, errorId, value) {
+            const input = document.getElementById(inputId);
+            const errorSpan = document.getElementById(errorId);
+            
+            if (value.trim() === '') {
+                input.classList.add('invalid');
+                errorSpan.style.display = 'block';
+                return false;
+            } else {
+                input.classList.remove('invalid');
+                errorSpan.style.display = 'none';
+                return true;
+            }
+        }
 
-  <p id="error"></p>
+        function validateLoginForm(event) {
+            event.preventDefault(); 
 
-  <script src="js/login.js"></script>
+            const email = document.getElementById('email-login').value;
+            const password = document.getElementById('password-login').value;
+
+            const isEmailValid = validateField('email-login', 'email-error', email);
+            const isPassValid = validateField('password-login', 'password-error', password);
+
+            if (isEmailValid && isPassValid) {
+                // Aqui você faria a lógica real de login, mas no momento redireciona para o cadastro
+                window.location.href = 'salvar_dados.html';
+            }
+        }
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('invalid');
+                this.nextElementSibling.style.display = 'none';
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,160 @@
+ * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #b8c1c8;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*Estilos da Tela de Login */
+        #login-screen {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-left {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        /* Avatar */
+        .avatar-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: contain;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 100%;
+        }
+
+        .login-form input {
+            background-color: transparent;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .login-form input.invalid {
+            border-color: red;
+        }
+
+        .error-msg {
+            color: red;
+            font-size: 12px;
+            margin-top: 2px;
+            display: none;
+            text-align: center;
+        }
+
+        /* Botão Principal (Entrar) */
+        button.btn-green {
+            background-color: #32c54a;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 18px;
+            color: #111;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        button.btn-green:hover {
+            background-color: #2ab03f;
+        }
+
+        /* Botão Secundário (Criar Conta) */
+        button.btn-outline {
+            background-color: transparent;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        button.btn-outline:hover {
+            background-color: #333;
+            color: white;
+        }
+
+        /* Painel Direito */
+        .login-right {
+            flex: 1;
+            background-color: #5c6c84;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            min-width: 350px;
+        }
+
+        /* Logo */
+        .logo-img {
+            max-width: 250px;
+            height: auto;
+            margin-bottom: 30px;
+            object-fit: contain;
+        }
+
+        .welcome-title {
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+
+        .welcome-subtitle {
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 300;
+            max-width: 250px;
+        }
+
+        /* Responsividade Básica */
+        @media (max-width: 768px) {
+            #login-screen {
+                flex-direction: column-reverse;
+            }
+            .login-right {
+                flex: none;
+                height: 40%;
+                min-width: 100%;
+                padding: 20px;
+            }
+        }
