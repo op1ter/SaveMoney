@@ -10,7 +10,7 @@
 
     <div id="login-screen">
         <div class="login-left">
-            <img class="avatar-img" src="img\icon_pessoa.png" alt="Avatar">
+            <img class="avatar-img" src="img/icon_pessoa.png" alt="Avatar">
             
             <form class="login-form" onsubmit="return validateLoginForm(event)">
                 <div class="input-wrapper">
@@ -21,15 +21,17 @@
                     <input type="password" id="password-login" placeholder="Senha">
                     <span class="error-msg" id="password-error">Por favor, preencha a senha</span>
                 </div>
-                
+                  
+                <span class="error-msg" id="global-error" style="text-align: center; margin-bottom: 15px; font-weight: bold;"></span>
+
                 <button type="submit" class="btn-green">Entrar</button>
-                
                 <button type="button" class="btn-outline" onclick="window.location.href='cadastro.html'">Criar conta</button>
+                <button type="button" class="btn-outline" onclick="window.location.href='esqueci_senha.html'" style="margin-top: 15px;">Esqueci minha senha</button>
             </form>
         </div>
         
         <div class="login-right">
-            <img class="logo-img" src="img\savemoney_logo.png" alt="SAVE Money Logo">
+            <img class="logo-img" src="img/savemoney_logo.png" alt="SAVE Money Logo">
             <h2 class="welcome-title">BEM-VINDO</h2>
             <p class="welcome-subtitle">PARA SE MANTER CONECTADO<br>FAÇA LOGIN COM SUAS CREDENCIAIS</p>
         </div>
@@ -56,20 +58,55 @@
 
             const email = document.getElementById('email-login').value;
             const password = document.getElementById('password-login').value;
+            const globalError = document.getElementById('global-error');
 
             const isEmailValid = validateField('email-login', 'email-error', email);
             const isPassValid = validateField('password-login', 'password-error', password);
 
             if (isEmailValid && isPassValid) {
-                // Aqui você faria a lógica real de login, mas no momento redireciona para o cadastro
-                window.location.href = 'salvar_dados.html';
+                // Monta os dados para enviar ao PHP
+                const loginData = {
+                    email: email,
+                    senha: password
+                };
+
+                // Requisição para o backend
+                fetch('../backend/api/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Salva o nome e ID do usuário no navegador para usar no Dashboard
+                        localStorage.setItem('userName', data.user.nome);
+                        localStorage.setItem('userId', data.user.id);
+                        
+                        // Redireciona para o sistema
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Exibe o erro retornado pelo banco (ex: E-mail não encontrado, senha incorreta)
+                        globalError.innerText = data.message;
+                        globalError.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro na requisição:", error);
+                    globalError.innerText = "Erro ao conectar com o servidor.";
+                    globalError.style.display = 'block';
+                });
             }
         }
 
+        // Limpa as mensagens de erro ao digitar
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', function() {
                 this.classList.remove('invalid');
                 this.nextElementSibling.style.display = 'none';
+                document.getElementById('global-error').style.display = 'none';
             });
         });
     </script>

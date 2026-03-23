@@ -1,32 +1,51 @@
 <?php
+// backend/api/login.php
 
-$data = json_decode(file_get_contents("php://input"), true);
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST");
 
-$email = $data['email'];
-$password = $data['password'];
+require_once '../config/database.php';
 
-$SUPABASE_URL = "https://unqfceucutbdfkurllsa.supabase.co";
-$SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVucWZjZXVjdXRiZGZrdXJsbHNhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjQ4ODc5MywiZXhwIjoyMDg4MDY0NzkzfQ.ac4jq9STmyLHtRQ0xNO3HPIyNrfD3OtGdTXxI39VmII";
+// Recebe os dados
+$data = json_decode(file_get_contents("php://input"));
 
-$url = $SUPABASE_URL . "/auth/v1/token?grant_type=password";
+if (!empty($data->email) && !empty($data->senha)) {
+    try {
+        // Busca o usuário pelo email na tabela (trazendo apenas o ID, NOME e SENHA)
+        $query = 'SELECT "ID_PF", "NOME_PF", "SENHA_PF" FROM "USUARIO" WHERE "EMAIL_PF" = :email LIMIT 1';
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':email', $data->email);
+        $stmt->execute();
 
-$payload = json_encode([
-    "email" => $email,
-    "password" => $password
-]);
+        // Verifica se encontrou algum e-mail
+        if ($stmt->rowCount() > 0) {
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$ch = curl_init($url);
+            // Verifica se a senha digitada bate com a senha criptografada do banco
+            if (password_verify($data->senha, $usuario['SENHA_PF'])) {
+                // Sucesso! Retorna os dados do usuário
+                echo json_encode([
+                    "status" => "success", 
+                    "message" => "Login realizado com sucesso",
+                    "user" => [
+                        "id" => $usuario['ID_PF'],
+                        "nome" => $usuario['NOME_PF']
+                    ]
+                ]);
+            } else {
+                // Senha incorreta
+                echo json_encode(["status" => "error", "message" => "Senha incorreta."]);
+            }
+        } else {
+            // Email não encontrado
+            echo json_encode(["status" => "error", "message" => "E-mail não encontrado."]);
+        }
 
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Content-Type: application/json",
-    "apikey: $SUPABASE_API_KEY"
-]);
-
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-
-$response = curl_exec($ch);
-
-curl_close($ch);
-
-echo $response;
+    } catch (PDOException $e) {
+        echo json_encode(["status" => "error", "message" => "Erro no banco: " . $e->getMessage()]);
+    }
+} else {
+    echo json_encode(["status" => "error", "message" => "Dados incompletos."]);
+}
+?>

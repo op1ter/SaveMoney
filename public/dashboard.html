@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Money - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #b8c1c8; display: flex; height: 100vh; }
+        
+        /* Menu Lateral */
+        .sidebar { width: 250px; background-color: #333; color: white; display: flex; flex-direction: column; padding: 20px; }
+        .sidebar img { width: 50px; margin-bottom: 30px; align-self: center; }
+        .sidebar a { color: white; text-decoration: none; padding: 15px 10px; margin-bottom: 5px; border-radius: 8px; transition: 0.2s; }
+        .sidebar a:hover { background-color: #32c54a; color: #111; }
+        .sidebar .logout-btn { margin-top: auto; background-color: #ff4757; text-align: center; cursor: pointer; }
+        .sidebar .logout-btn:hover { background-color: #ff6b81; color: white; }
+
+        /* Área Principal */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .header h1 { color: #333; }
+        
+        /* Cards Financeiros */
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        .card { background-color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .card h3 { font-size: 16px; color: #666; margin-bottom: 10px; }
+        .card p { font-size: 28px; font-weight: bold; color: #333; }
+        .card.green p { color: #32c54a; }
+        .card.red p { color: #ff4757; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <img src="img/savemoney_icon.png" alt="Logo">
+        <a href="#">🏠 Visão Geral</a>
+        <a href="#">💸 Transações</a>
+        <a href="#">📊 Relatórios</a>
+        <a href="#">⚙️ Configurações</a>
+        <a class="logout-btn" onclick="logout()">Sair do Sistema</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Olá, <span id="user-name-display">Usuário</span>! 👋</h1>
+            <p>Seu painel financeiro</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <h3>Saldo Atual</h3>
+                <p>R$ 0,00</p>
+            </div>
+            <div class="card green">
+                <h3>Receitas (Mês)</h3>
+                <p>+ R$ 0,00</p>
+            </div>
+            <div class="card red">
+                <h3>Despesas (Mês)</h3>
+                <p>- R$ 0,00</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Trava de segurança: verifica se o usuário está logado
+        window.onload = function() {
+            const userName = localStorage.getItem('userName');
+            
+            if (!userName) {
+                // Se não tiver nome salvo, manda pro login
+                window.location.href = 'login.html';
+            } else {
+                // Se tiver, escreve o nome dele na tela (pegando só o primeiro nome)
+                const primeiroNome = userName.split(' ')[0];
+                document.getElementById('user-name-display').innerText = primeiroNome;
+            }
+        };
+
+        // Função de Sair
+        function logout() {
+            localStorage.clear(); // Limpa os dados salvos
+            window.location.href = 'login.html'; // Redireciona
+        }
+    </script>
+</body>
+</html>

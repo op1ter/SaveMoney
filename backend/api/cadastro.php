@@ -8,28 +8,49 @@ header("Access-Control-Allow-Methods: POST");
 // Inclui a conexão com o banco
 require_once '../config/database.php';
 
-// Recebe os dados do frontend (como estamos enviando via fetch, pegamos o JSON)
+// Recebe os dados em JSON enviados pelo fetch() do JavaScript
 $data = json_decode(file_get_contents("php://input"));
 
-if (!empty($data->nome) && !empty($data->email) && !empty($data->senha)) {
+// Verifica se os dados essenciais chegaram
+if (!empty($data->nome) && !empty($data->email) && !empty($data->senha) && !empty($data->cpf)) {
     try {
-        // Criptografa a senha antes de salvar (MUITO IMPORTANTE)
+        // Criptografa a senha antes de salvar no banco
         $senhaHash = password_hash($data->senha, PASSWORD_DEFAULT);
 
-        // Prepara a query de inserção (ajuste os nomes das colunas conforme sua tabela no Supabase)
-        $query = "INSERT INTO usuarios (nome, data_nascimento, cpf, telefone, cep, endereco, numero, cidade, estado, email, senha) 
-                  VALUES (:nome, :data_nascimento, :cpf, :telefone, :cep, :endereco, :numero, :cidade, :estado, :email, :senha)";
+        // A query agora mapeia exatamente as colunas da sua tabela USUARIO
+        $query = 'INSERT INTO "USUARIO" (
+                    "NOME_PF", 
+                    "DATA_NASCIMENTO_PF", 
+                    "CPF_PF", 
+                    "CELULAR_PF", 
+                    "ENDERECO_PF", 
+                    "NUMERO_CASA_PF",
+                    "CIDADE_PF",
+                    "ESTADO_PF",
+                    "EMAIL_PF", 
+                    "SENHA_PF"
+                  ) VALUES (
+                    :nome, 
+                    :data_nascimento, 
+                    :cpf, 
+                    :celular, 
+                    :endereco, 
+                    :numero_casa,
+                    :cidade,
+                    :estado,
+                    :email, 
+                    :senha
+                  )';
         
         $stmt = $pdo->prepare($query);
 
-        // Bind dos parâmetros para evitar SQL Injection
+        // Aqui ligamos os dados que vieram do JavaScript com as variáveis da Query acima
         $stmt->bindParam(':nome', $data->nome);
         $stmt->bindParam(':data_nascimento', $data->data_nascimento);
         $stmt->bindParam(':cpf', $data->cpf);
-        $stmt->bindParam(':telefone', $data->telefone);
-        $stmt->bindParam(':cep', $data->cep);
-        $stmt->bindParam(':endereco', $data->endereco);
-        $stmt->bindParam(':numero', $data->numero);
+        $stmt->bindParam(':celular', $data->telefone); // Do JS vem como 'telefone'
+        $stmt->bindParam(':endereco', $data->endereco); 
+        $stmt->bindParam(':numero_casa', $data->numero); // Do JS vem como 'numero'
         $stmt->bindParam(':cidade', $data->cidade);
         $stmt->bindParam(':estado', $data->estado);
         $stmt->bindParam(':email', $data->email);
@@ -41,7 +62,7 @@ if (!empty($data->nome) && !empty($data->email) && !empty($data->senha)) {
             echo json_encode(["status" => "error", "message" => "Erro ao cadastrar usuário."]);
         }
     } catch (PDOException $e) {
-        // Trata erro de e-mail ou CPF duplicado (se configurado como UNIQUE no banco)
+        // Captura erro de restrição UNIQUE (CPF ou E-mail repetido)
         if ($e->getCode() == '23505') {
              echo json_encode(["status" => "error", "message" => "E-mail ou CPF já cadastrados."]);
         } else {
@@ -49,6 +70,6 @@ if (!empty($data->nome) && !empty($data->email) && !empty($data->senha)) {
         }
     }
 } else {
-    echo json_encode(["status" => "error", "message" => "Dados incompletos."]);
+    echo json_encode(["status" => "error", "message" => "Dados incompletos. Preencha todos os campos."]);
 }
 ?>
