@@ -1,0 +1,226 @@
+/* ================= MÁSCARAS ================= */
+        document.getElementById('cpf-reg').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ""); // Remove não-números
+            value = value.replace(/(\d{3})(\d)/, "$1.$2");
+            value = value.replace(/(\d{3})(\d)/, "$1.$2");
+            value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            e.target.value = value;
+            this.classList.remove('invalid');
+            document.getElementById('cpf-error').style.display = 'none';
+        });
+
+        document.getElementById('tel-reg').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, "");
+            value = value.replace(/(\d{2})(\d)/, "($1) $2");
+            value = value.replace(/(\d{5})(\d)/, "$1-$2");
+            e.target.value = value;
+        });
+
+        document.getElementById('cep-reg').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, "");
+            value = value.replace(/(\d{5})(\d)/, "$1-$2");
+            e.target.value = value;
+        });
+
+        /* ================= API VIA CEP ================= */
+        document.getElementById('cep-reg').addEventListener('blur', async function() {
+            const cep = this.value.replace(/\D/g, '');
+            if (cep.length === 8) {
+                try {
+                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await response.json();
+                    
+                    if (!data.erro) {
+                        document.getElementById('addr-reg').value = data.logradouro;
+                        document.getElementById('city-reg').value = data.localidade;
+                        document.getElementById('state-reg').value = data.uf;
+                        
+                        // Foca no número após preencher o endereço
+                        document.getElementById('num-reg').focus();
+
+                        // Remove marcas de erro dos campos preenchidos
+                        ['addr-reg', 'city-reg', 'state-reg'].forEach(id => {
+                            document.getElementById(id).classList.remove('invalid');
+                            document.getElementById(id.replace('-reg', '-error')).style.display = 'none';
+                        });
+                    } else {
+                        alert("CEP não encontrado!");
+                    }
+                } catch (error) {
+                    console.error("Erro ao buscar o CEP:", error);
+                }
+            }
+        });
+
+        /* ================= VALIDAÇÕES ================= */
+        function validateField(inputId, errorId, value) {
+            const input = document.getElementById(inputId);
+            const errorSpan = document.getElementById(errorId);
+            
+            if (value.trim() === '') {
+                input.classList.add('invalid');
+                errorSpan.style.display = 'block';
+                return false;
+            } else {
+                input.classList.remove('invalid');
+                errorSpan.style.display = 'none';
+                return true;
+            }
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+            if (cpf === '' || cpf.length !== 11) return false;
+            const invalidCpfs = [
+                "00000000000", "11111111111", "22222222222", "33333333333",
+                "44444444444", "55555555555", "66666666666", "77777777777",
+                "88888888888", "99999999999"
+            ];
+            if (invalidCpfs.includes(cpf)) return false;
+
+            let add = 0;
+            for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
+            let rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(9))) return false;
+
+            add = 0;
+            for (let i = 0; i < 10; i++) add += parseInt(cpf.charAt(i)) * (11 - i);
+            rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(10))) return false;
+
+            return true;
+        }
+
+        // Função principal disparada ao clicar no botão Salvar
+        function validateRegisterForm(event) {
+            event.preventDefault(); // Impede o recarregamento da página
+
+            const name = document.getElementById('name-reg').value;
+            const dob = document.getElementById('dob-reg').value;
+            const cpf = document.getElementById('cpf-reg').value;
+            const tel = document.getElementById('tel-reg').value;
+            const cep = document.getElementById('cep-reg').value;
+            const addr = document.getElementById('addr-reg').value;
+            const num = document.getElementById('num-reg').value;
+            const city = document.getElementById('city-reg').value;
+            const state = document.getElementById('state-reg').value;
+            const email = document.getElementById('email-reg').value;
+            const pass = document.getElementById('pass-reg').value;
+            const passConfirm = document.getElementById('pass-confirm-reg').value;
+
+            // Validações básicas de preenchimento
+            const isNameValid = validateField('name-reg', 'name-error', name);
+            const isDobValid = validateField('dob-reg', 'dob-error', dob);
+            const isTelValid = validateField('tel-reg', 'tel-error', tel);
+            const isCepValid = validateField('cep-reg', 'cep-error', cep);
+            const isAddrValid = validateField('addr-reg', 'addr-error', addr);
+            const isNumValid = validateField('num-reg', 'num-error', num);
+            const isCityValid = validateField('city-reg', 'city-error', city);
+            const isStateValid = validateField('state-reg', 'state-error', state);
+            const isPassValid = validateField('pass-reg', 'pass-error', pass);
+
+            // Validação de E-mail
+            let isEmailFormatValid = false;
+            const emailInput = document.getElementById('email-reg');
+            const emailError = document.getElementById('email-error');
+            if (!validateField('email-reg', 'email-error', email)) {
+                emailError.innerText = 'Por favor, preencha este campo';
+            } else if (!validateEmail(email)) {
+                emailInput.classList.add('invalid');
+                emailError.innerText = 'E-mail em formato inválido';
+                emailError.style.display = 'block';
+            } else {
+                isEmailFormatValid = true;
+                emailInput.classList.remove('invalid');
+                emailError.style.display = 'none';
+            }
+
+            // Validação Específica do CPF
+            const cpfInput = document.getElementById('cpf-reg');
+            const cpfError = document.getElementById('cpf-error');
+            const isCpfEmpty = !validateField('cpf-reg', 'cpf-error', cpf);
+            let isCpfFormatValid = false;
+
+            if (!isCpfEmpty) {
+                if (validateCPF(cpf)) {
+                    isCpfFormatValid = true;
+                    cpfInput.classList.remove('invalid');
+                    cpfError.style.display = 'none';
+                } else {
+                    isCpfFormatValid = false;
+                    cpfInput.classList.add('invalid');
+                    cpfError.innerText = 'CPF inválido';
+                    cpfError.style.display = 'block';
+                }
+            } else {
+                cpfError.innerText = 'Por favor, preencha este campo';
+            }
+
+            // Validação de Igualdade de Senhas
+            let isPassMatch = false;
+            const passConfirmInput = document.getElementById('pass-confirm-reg');
+            const passConfirmError = document.getElementById('pass-confirm-error');
+            
+            if (!validateField('pass-confirm-reg', 'pass-confirm-error', passConfirm)) {
+                passConfirmError.innerText = 'Por favor, preencha este campo';
+            } else if (pass !== passConfirm) {
+                passConfirmInput.classList.add('invalid');
+                passConfirmError.innerText = 'As senhas não coincidem';
+                passConfirmError.style.display = 'block';
+            } else {
+                isPassMatch = true;
+                passConfirmInput.classList.remove('invalid');
+                passConfirmError.style.display = 'none';
+            }
+
+            // Verificação Final
+            // Verificação Final
+            if (isNameValid && isDobValid && isCpfFormatValid && isTelValid && isCepValid && 
+                isAddrValid && isNumValid && isCityValid && isStateValid && 
+                isEmailFormatValid && isPassValid && isPassMatch) {
+                
+                // Monta o objeto com os dados para envio
+                const userData = {
+                    nome: name,
+                    data_nascimento: dob,
+                    cpf: cpf,
+                    telefone: tel,
+                    cep: cep,
+                    endereco: addr,
+                    numero: num,
+                    cidade: city,
+                    estado: state,
+                    email: email,
+                    senha: pass
+                };
+
+                // Envia para o PHP
+                fetch('../backend/api/cadastro.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        window.location.href = 'login.html'; // Redireciona para o login
+                    } else {
+                        alert("Erro: " + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro na requisição:", error);
+                    alert("Erro ao conectar com o servidor.");
+                });
+            }
+        }
